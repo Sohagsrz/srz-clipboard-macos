@@ -10,8 +10,13 @@ import SwiftUI
 @main
 struct Srz_ClipboardApp: App {
     var body: some Scene {
-        WindowGroup {
+        MenuBarExtra("Srz Clipboard", systemImage: "doc.on.clipboard") {
             ContentView()
+        }
+        .menuBarExtraStyle(.window)
+        
+        Settings {
+            SettingsView()
         }
     }
 }

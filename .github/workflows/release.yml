@@ -1,0 +1,62 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Xcode
+      uses: maxim-lobanov/setup-xcode@v1
+      with:
+        xcode-version: latest-stable
+        
+    - name: Build Release
+      run: |
+        xcodebuild -project "Srz Clipboard.xcodeproj" \
+                   -scheme "Srz Clipboard" \
+                   -configuration Release \
+                   -derivedDataPath DerivedData \
+                   build
+                   
+    - name: Create DMG
+      run: |
+        mkdir -p Release
+        cp -R "DerivedData/Build/Products/Release/Srz Clipboard.app" "Release/"
+        
+        # Create DMG
+        hdiutil create -volname "Srz Clipboard" \
+                       -srcfolder "Release" \
+                       -ov -format UDZO \
+                       "Srz_Clipboard_${GITHUB_REF_NAME}.dmg"
+                       
+        # Create checksum
+        shasum -a 256 "Srz_Clipboard_${GITHUB_REF_NAME}.dmg" > "Srz_Clipboard_${GITHUB_REF_NAME}.dmg.sha256"
+        
+    - name: Upload Release Assets
+      uses: actions/upload-artifact@v4
+      with:
+        name: release-assets
+        path: |
+          Srz_Clipboard_*.dmg
+          Srz_Clipboard_*.dmg.sha256
+          
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          Srz_Clipboard_*.dmg
+          Srz_Clipboard_*.dmg.sha256
+        generate_release_notes: true
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

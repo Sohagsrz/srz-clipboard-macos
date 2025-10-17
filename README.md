@@ -1,59 +1,171 @@
-# Srz Clipboard
+# 🚀 Srz Clipboard
 
-A macOS clipboard manager that provides Windows-like clipboard history functionality with global hotkey support.
+A powerful macOS clipboard manager inspired by Windows clipboard functionality, built with SwiftUI.
 
-## Features
+![Srz Clipboard](https://img.shields.io/badge/macOS-15.6+-blue.svg)
+![Swift](https://img.shields.io/badge/Swift-5.0-orange.svg)
+![SwiftUI](https://img.shields.io/badge/SwiftUI-5.0-green.svg)
+![License](https://img.shields.io/badge/License-MIT-yellow.svg)
 
-- **Global Hotkey**: Press `Cmd+Alt+V` anywhere to show clipboard history
-- **Clipboard Monitoring**: Automatically tracks clipboard changes
-- **Click to Append**: Click any item in history to append it to current clipboard
-- **Search**: Search through clipboard history
-- **Dark/Light Theme**: Toggle between themes with the theme switcher
-- **Menu Bar Integration**: Runs in the background with menu bar icon
-- **Persistent Storage**: History is saved between app restarts
-- **Settings**: Configure max history items and other preferences
+## ✨ Features
 
-## How to Use
+### 🎯 **Core Functionality**
+- **Windows-like Clipboard History** - Press `Cmd+Alt+V` to show floating panel
+- **Smart Content Intelligence** - Auto-tagging, language detection, link extraction
+- **Triple-Method Paste System** - Guaranteed paste functionality with fallbacks
+- **Command-Line Interface** - Powerful text-based commands for advanced users
+- **Pin & Favorite System** - Keep important items accessible
+- **Search & Filter** - Find items quickly with fuzzy search and regex support
 
-1. **Launch the App**: The app will appear in your menu bar with a clipboard icon
-2. **Global Hotkey**: Press `Cmd+Alt+V` anywhere to show the clipboard history popup
-3. **Append Text**: Click any item in the history to append it to your current clipboard
-4. **Search**: Use the search bar to find specific clipboard items
-5. **Delete Items**: Hover over items and click the trash icon to delete them
-6. **Clear All**: Use the "Clear All" button to remove all history
-7. **Settings**: Access settings through the menu bar or app preferences
+### 🔧 **Advanced Features**
+- **Export/Import** - Backup and restore clipboard history
+- **Theme Support** - Dark/light mode with custom themes
+- **Smart Notifications** - Clear user guidance for paste operations
+- **Performance Optimized** - Release build with optimizations
+- **Privacy First** - All data stays local on your Mac
 
-## Installation
+## 🚀 Quick Start
 
-1. Open the project in Xcode
-2. Build and run the project
-3. The app will be installed and will start running in the background
+### Installation
+1. **Download** the latest release DMG file
+2. **Mount** the DMG and drag the app to Applications
+3. **Launch** the app (appears in menu bar)
+4. **Grant** Accessibility permissions when prompted
+5. **Press** `Cmd+Alt+V` to open the floating clipboard panel
 
-## Requirements
+### Basic Usage
+- **Copy text/images** as usual - automatically added to history
+- **Press `Cmd+Alt+V`** - show clipboard history floating panel
+- **Click any item** - paste it into focused application
+- **Use commands** - type commands in the panel for advanced operations
 
-- macOS 12.0 or later
-- Xcode 14.0 or later
+## 🎮 Command Interface
 
-## Permissions
+Type commands in the floating panel:
 
-The app requires the following permissions:
-- **Accessibility**: For global hotkey registration
-- **Clipboard Access**: For monitoring clipboard changes
+### **Core Commands**
+```bash
+help                    # Show all available commands
+pin 0                   # Pin the first item
+unpin 0                 # Unpin the first item
+favorite 0               # Mark item as favorite
+delete 0                 # Delete item from history
+clear                    # Clear all non-pinned items
+```
 
-## Technical Details
+### **Search & Filter**
+```bash
+search "keyword"         # Fuzzy search clipboard history
+search re:regex          # Regex search
+type:text                # Filter by content type
+pinned:true              # Show only pinned items
+```
 
-- Built with SwiftUI for macOS
-- Uses Carbon framework for global hotkey registration
-- NSPasteboard for clipboard monitoring
-- UserDefaults for persistent storage
-- MenuBarExtra for background operation
+### **Content Intelligence**
+```bash
+auto-tag                 # Auto-tag all items
+summarize 0              # Summarize item content
+detect-lang 0            # Detect language of item
+extract-links 0          # Extract links from item
+shorten-url 0            # Shorten URLs in item
+```
 
-## Author
+### **Data Management**
+```bash
+export history           # Export to JSON
+import history           # Import from JSON
+stats 0                  # Show item statistics
+log show 10              # Show recent actions
+```
 
-Created by Md Sohag Islam
+## 🔧 System Requirements
 
-## Version
+- **macOS:** 15.6 or later
+- **Architecture:** Apple Silicon (ARM64) and Intel (x86_64)
+- **Memory:** 50MB RAM usage
+- **Storage:** 1MB disk space
 
-1.0.0
-# srz-clipboard-macos
-# srz-clipboard-macos
+## 🛡️ Permissions
+
+### **Required Permissions:**
+1. **Accessibility** - For automatic paste functionality
+   - Go to System Settings → Privacy & Security → Accessibility
+   - Add "Srz Clipboard" and enable it
+
+2. **Automation** - For AppleScript paste fallback
+   - Go to System Settings → Privacy & Security → Automation
+   - Enable "System Events" for Srz Clipboard
+
+### **Optional Permissions:**
+- **Notifications** - For paste confirmations
+- **Full Disk Access** - For advanced file operations
+
+## 🔒 Privacy & Security
+
+- **Local Storage** - All clipboard data stays on your Mac
+- **No Cloud Sync** - Privacy-first approach
+- **Secure Permissions** - Only requests necessary system access
+- **No Data Transmission** - No external data sharing
+
+## 🐛 Troubleshooting
+
+### **Paste doesn't work automatically**
+- **Solution:** Grant Accessibility permissions and restart the app
+- **Fallback:** You'll get notifications guiding you to press Cmd+V
+
+### **Floating panel doesn't appear**
+- **Solution:** Check Accessibility permissions
+- **Alternative:** Use the menu bar icon to access history
+
+### **Hotkey conflicts**
+- **Solution:** Change hotkey in Settings or disable conflicting apps
+
+## 📦 Download
+
+### **Latest Release: v2.0.0**
+- **DMG File:** [Srz_Clipboard_v2.0.0.dmg](Srz_Clipboard_v2.0.0.dmg) (628KB)
+- **Checksum:** [Srz_Clipboard_v2.0.0.dmg.sha256](Srz_Clipboard_v2.0.0.dmg.sha256)
+
+### **Verification**
+```bash
+# Verify download integrity
+shasum -a 256 Srz_Clipboard_v2.0.0.dmg
+```
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to:
+
+- **Submit Issues** - Bug reports and feature requests
+- **Create Pull Requests** - Code improvements and new features
+- **Join Discussions** - Share ideas and get help
+- **Star the Repository** - Show your support
+
+### **Development Setup**
+1. Clone the repository
+2. Open `Srz Clipboard.xcodeproj` in Xcode
+3. Build and run the project
+4. Make your changes and test thoroughly
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Credits
+
+- **Developer:** Md Sohag Islam
+- **Framework:** SwiftUI, AppKit
+- **Icons:** SF Symbols
+- **Inspiration:** Windows Clipboard Manager
+
+## 📞 Support
+
+- **GitHub Issues** - Bug reports and feature requests
+- **GitHub Discussions** - Community support and ideas
+- **Built-in Help** - Type `help` in the command interface
+
+---
+
+**🎉 Thank you for using Srz Clipboard!**
+
+**Made with ❤️ for macOS users**

@@ -163,12 +163,99 @@ class ClipboardManager: ObservableObject {
         copyToClipboard(item.content)
         print("✅ Text copied to clipboard")
         
-        // Perform paste after a short delay
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-            self.performPaste()
+        // Try the most reliable method first
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            self.performReliablePaste()
         }
         
-        logAction("paste \(index)", "✅ Pasted")
+        logAction("paste \(index)", "✅ Attempted paste")
+    }
+    
+    private func performReliablePaste() {
+        print("🔄 Performing reliable paste...")
+        
+        // Method 1: Try AppleScript (most reliable on modern macOS)
+        if tryAppleScriptPaste() {
+            print("✅ AppleScript paste successful")
+            return
+        }
+        
+        // Method 2: Try CGEvent
+        if tryCGEventPaste() {
+            print("✅ CGEvent paste successful")
+            return
+        }
+        
+        // Method 3: Show helpful notification
+        print("⚠️ All paste methods failed, showing notification")
+        showHelpfulNotification()
+    }
+    
+    private func tryAppleScriptPaste() -> Bool {
+        print("🎯 Trying AppleScript paste...")
+        
+        let script = """
+        tell application "System Events"
+            keystroke "v" using command down
+        end tell
+        """
+        
+        let appleScript = NSAppleScript(source: script)
+        var error: NSDictionary?
+        let result = appleScript?.executeAndReturnError(&error)
+        
+        if let error = error {
+            print("❌ AppleScript error: \(error)")
+            return false
+        }
+        
+        print("✅ AppleScript executed successfully")
+        return true
+    }
+    
+    private func tryCGEventPaste() -> Bool {
+        print("🎯 Trying CGEvent paste...")
+        
+        guard let source = CGEventSource(stateID: .hidSystemState) else {
+            print("❌ Failed to create CGEventSource")
+            return false
+        }
+        
+        let keyDown = CGEvent(keyboardEventSource: source, virtualKey: 9, keyDown: true)
+        let keyUp = CGEvent(keyboardEventSource: source, virtualKey: 9, keyDown: false)
+        
+        guard let keyDown = keyDown, let keyUp = keyUp else {
+            print("❌ Failed to create CGEvent")
+            return false
+        }
+        
+        keyDown.flags = .maskCommand
+        keyUp.flags = .maskCommand
+        
+        keyDown.post(tap: .cghidEventTap)
+        keyUp.post(tap: .cghidEventTap)
+        
+        print("✅ CGEvent posted")
+        return true
+    }
+    
+    private func showHelpfulNotification() {
+        // Create a helpful notification
+        let notification = NSUserNotification()
+        notification.title = "Srz Clipboard"
+        notification.informativeText = "Text copied! Press Cmd+V to paste into any app."
+        notification.soundName = NSUserNotificationDefaultSoundName
+        NSUserNotificationCenter.default.deliver(notification)
+        
+        // Also show a system alert for better visibility
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            let alert = NSAlert()
+            alert.messageText = "Text Copied to Clipboard"
+            alert.informativeText = "The text has been copied to your clipboard.\n\nPress Cmd+V to paste it into any application."
+            alert.alertStyle = .informational
+            alert.addButton(withTitle: "OK")
+            alert.runModal()
+        }
     }
     
     func appendItem(at index: Int) {

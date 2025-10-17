@@ -264,10 +264,10 @@ struct FloatingPanelView: View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 8) {
                 ForEach(Array(pinnedItems.prefix(8).enumerated()), id: \.element.id) { index, item in
-                    Button(action: {
-                        clipboardManager.pasteItem(at: index)
-                        manager.hidePanel()
-                    }) {
+                                Button(action: {
+                                    clipboardManager.pasteItem(at: index)
+                                    manager.hidePanel()
+                                }) {
                         VStack(spacing: 2) {
                             Text(item.preview)
                                 .font(.system(.caption, design: .monospaced))
@@ -366,14 +366,14 @@ struct FloatingPanelView: View {
         ScrollView {
             LazyVStack(spacing: 1) {
                 ForEach(Array(filteredHistory.enumerated()), id: \.element.id) { index, item in
-                    FloatingItemView(
-                        item: item,
-                        index: index,
-                        isSelected: index == clipboardManager.selectedIndex
-                    ) {
-                        clipboardManager.pasteItem(at: index)
-                        manager.hidePanel()
-                    } onAppend: {
+                                FloatingItemView(
+                                    item: item,
+                                    index: index,
+                                    isSelected: index == clipboardManager.selectedIndex
+                                ) {
+                                    clipboardManager.pasteItem(at: index)
+                                    manager.hidePanel()
+                                } onAppend: {
                         clipboardManager.appendItem(at: index)
                     } onDelete: {
                         clipboardManager.deleteItem(at: index)

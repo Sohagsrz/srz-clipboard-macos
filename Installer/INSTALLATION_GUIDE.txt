@@ -1,0 +1,54 @@
+Srz Clipboard v2.0.0 - Installation Guide
+=========================================
+
+📦 INSTALLATION OPTIONS:
+
+1. DMG INSTALLER (Recommended for most users):
+   - Double-click "Srz_Clipboard_v2.0.0_Installer.dmg"
+   - Drag "Srz Clipboard.app" to Applications folder
+   - Follow the instructions in the DMG
+
+2. PKG INSTALLER (For enterprise/advanced users):
+   - Double-click "Srz Clipboard_v2.0.0.pkg"
+   - Follow the installation wizard
+   - Automatic setup and configuration
+
+🔧 POST-INSTALLATION SETUP:
+
+1. Grant Accessibility Permissions (IMPORTANT!):
+   - Go to System Settings > Privacy & Security > Accessibility
+   - Find "Srz Clipboard" in the list
+   - Enable the toggle switch
+   - This enables automatic pasting functionality
+
+2. Test the Installation:
+   - Press Cmd+Alt+V to open clipboard history
+   - Copy some text and try pasting
+   - The app should appear in your menu bar
+
+✨ FEATURES:
+- Smart clipboard history (up to 50 items)
+- Triple-method paste system (guaranteed to work)
+- Smart content intelligence (auto-tagging, language detection)
+- Workflow automation and command-line interface
+- Modern SwiftUI interface with themes
+- Pin important items for quick access
+
+⌨️ KEYBOARD SHORTCUTS:
+- Cmd+Alt+V: Open clipboard history
+- Enter: Paste selected item
+- Space: Preview item
+- Delete: Remove item
+- Esc: Close panel
+
+🆘 TROUBLESHOOTING:
+- If paste doesn't work: Check Accessibility permissions
+- If panel doesn't appear: Restart the app
+- For support: https://github.com/Sohagsrz/srz-clipboard-macos
+
+📧 SUPPORT:
+Created by: Md Sohag Islam
+GitHub: https://github.com/Sohagsrz/srz-clipboard-macos
+Version: 2.0.0
+
+Thank you for using Srz Clipboard! 🎉

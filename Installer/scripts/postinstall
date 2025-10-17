@@ -1,0 +1,58 @@
+#!/bin/bash
+
+echo "🔧 Srz Clipboard Post-installation Setup"
+echo "========================================"
+
+# Set proper permissions
+echo "🔐 Setting application permissions..."
+chmod -R 755 "/Applications/Srz Clipboard.app"
+
+# Create LaunchAgent for auto-start
+echo "🚀 Configuring auto-start..."
+LAUNCH_AGENT_DIR="$HOME/Library/LaunchAgents"
+LAUNCH_AGENT_FILE="$LAUNCH_AGENT_DIR/com.sohag.srz-clipboard.plist"
+
+mkdir -p "$LAUNCH_AGENT_DIR"
+
+cat > "$LAUNCH_AGENT_FILE" << 'LAUNCH_EOF'
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.sohag.srz-clipboard</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Applications/Srz Clipboard.app/Contents/MacOS/Srz Clipboard</string>
+    </array>
+    <key>RunAtLoad</key>
+    <true/>
+    <key>KeepAlive</key>
+    <true/>
+    <key>ProcessType</key>
+    <string>Background</string>
+</dict>
+</plist>
+LAUNCH_EOF
+
+chmod 644 "$LAUNCH_AGENT_FILE"
+
+# Load the LaunchAgent
+launchctl load "$LAUNCH_AGENT_FILE" 2>/dev/null || true
+
+# Create application support directory
+mkdir -p "$HOME/Library/Application Support/Srz Clipboard"
+
+echo "✅ Post-installation setup completed!"
+echo ""
+echo "🎉 Srz Clipboard v2.0.0 installed successfully!"
+echo ""
+echo "📋 Next Steps:"
+echo "   1. The app is now running in your menu bar"
+echo "   2. Press Cmd+Alt+V to access clipboard history"
+echo "   3. Grant Accessibility permissions for full functionality:"
+echo "      • Go to System Settings > Privacy & Security > Accessibility"
+echo "      • Add 'Srz Clipboard' to the list"
+echo "      • Enable the toggle"
+
+exit 0

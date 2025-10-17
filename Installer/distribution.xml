@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<installer-gui-script minSpecVersion="1">
+    <title>Srz Clipboard 2.0.0</title>
+    <organization>com.sohag</organization>
+    <domains enable_localSystem="true"/>
+    <options customize="never" require-scripts="true" rootVolumeOnly="true"/>
+    
+    <!-- Define the volume choices -->
+    <choices-outline>
+        <line choice="default">
+            <line choice="SrzClipboard"/>
+        </line>
+    </choices-outline>
+    
+    <choice id="default"/>
+    <choice id="SrzClipboard" visible="false">
+        <pkg-ref id="com.sohag.srz-clipboard"/>
+    </choice>
+    
+    <pkg-ref id="com.sohag.srz-clipboard" version="2.0.0" onConclusion="none">SrzClipboard.pkg</pkg-ref>
+    
+    <installation-check script="pm_install_check();"/>
+    <script>
+    <![CDATA[
+        function pm_install_check() {
+            if(!(system.version.ProductVersion >= '11.0')) {
+                my.result.title = 'Srz Clipboard Installation Failed';
+                my.result.message = 'Srz Clipboard requires macOS 11.0 or later.\n\nCurrent version: ' + system.version.ProductVersion;
+                my.result.type = 'Fatal';
+                return false;
+            }
+            return true;
+        }
+    ]]>
+    </script>
+    
+    <welcome file="welcome.html"/>
+    <license file="license.html"/>
+    <conclusion file="conclusion.html"/>
+</installer-gui-script>

@@ -1,0 +1,30 @@
+#!/bin/bash
+
+echo "🔍 Srz Clipboard Pre-installation Check"
+echo "======================================"
+
+# Check macOS version
+MACOS_VERSION=$(sw_vers -productVersion | cut -d. -f1,2)
+REQUIRED_VERSION="11.0"
+
+echo "📱 Current macOS version: $MACOS_VERSION"
+
+if (( $(echo "$MACOS_VERSION < $REQUIRED_VERSION" | bc -l) )); then
+    echo "❌ Error: macOS $REQUIRED_VERSION or later is required"
+    echo "   Current version: $MACOS_VERSION"
+    exit 1
+fi
+
+echo "✅ macOS version check passed"
+
+# Check if app is already installed
+if [ -d "/Applications/Srz Clipboard.app" ]; then
+    echo "⚠️  Srz Clipboard is already installed"
+    echo "🔄 Stopping existing instances..."
+    pkill -f "Srz Clipboard" 2>/dev/null || true
+    sleep 2
+    echo "✅ Existing instances stopped"
+fi
+
+echo "✅ Pre-installation checks completed"
+exit 0

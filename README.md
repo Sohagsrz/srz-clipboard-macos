@@ -56,3 +56,4 @@ Created by Md Sohag Islam
 
 1.0.0
 # srz-clipboard-macos
+# srz-clipboard-macos

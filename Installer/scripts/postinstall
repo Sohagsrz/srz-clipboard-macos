@@ -19,18 +19,63 @@ cat > "$LAUNCH_AGENT_FILE" << 'LAUNCH_EOF'
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+    <!-- Basic Configuration -->
     <key>Label</key>
     <string>com.sohag.srz-clipboard</string>
+    
+    <!-- Program to run -->
     <key>ProgramArguments</key>
     <array>
         <string>/Applications/Srz Clipboard.app/Contents/MacOS/Srz Clipboard</string>
     </array>
+    
+    <!-- Auto-start Configuration -->
     <key>RunAtLoad</key>
     <true/>
+    
+    <!-- Keep the app running -->
     <key>KeepAlive</key>
     <true/>
+    
+    <!-- Process Type -->
     <key>ProcessType</key>
     <string>Background</string>
+    
+    <!-- Environment Variables -->
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+    </dict>
+    
+    <!-- Logging Configuration -->
+    <key>StandardOutPath</key>
+    <string>/tmp/srz-clipboard.log</string>
+    <key>StandardErrorPath</key>
+    <string>/tmp/srz-clipboard-error.log</string>
+    
+    <!-- Resource Limits -->
+    <key>SoftResourceLimits</key>
+    <dict>
+        <key>NumberOfFiles</key>
+        <integer>1024</integer>
+    </dict>
+    
+    <!-- Restart Configuration -->
+    <key>ThrottleInterval</key>
+    <integer>10</integer>
+    
+    <!-- Network Configuration -->
+    <key>NetworkState</key>
+    <string>Any</string>
+    
+    <!-- User Session -->
+    <key>LimitLoadToSessionType</key>
+    <string>Aqua</string>
+    
+    <!-- Disable App Nap -->
+    <key>LSUIElement</key>
+    <true/>
 </dict>
 </plist>
 LAUNCH_EOF
@@ -40,12 +85,25 @@ chmod 644 "$LAUNCH_AGENT_FILE"
 # Load the LaunchAgent
 launchctl load "$LAUNCH_AGENT_FILE" 2>/dev/null || true
 
+# Verify LaunchAgent is loaded
+if launchctl list | grep -q "com.sohag.srz-clipboard"; then
+    echo "✅ Auto-start configuration loaded successfully"
+else
+    echo "⚠️  Auto-start configuration may need manual setup"
+fi
+
 # Create application support directory
 mkdir -p "$HOME/Library/Application Support/Srz Clipboard"
 
 echo "✅ Post-installation setup completed!"
 echo ""
 echo "🎉 Srz Clipboard v2.0.0 installed successfully!"
+echo ""
+echo "🚀 Auto-Start Features:"
+echo "   • App will start automatically when you log in"
+echo "   • App will restart automatically if it crashes"
+echo "   • App runs continuously in the background"
+echo "   • App will start after system restart"
 echo ""
 echo "📋 Next Steps:"
 echo "   1. The app is now running in your menu bar"
@@ -54,5 +112,9 @@ echo "   3. Grant Accessibility permissions for full functionality:"
 echo "      • Go to System Settings > Privacy & Security > Accessibility"
 echo "      • Add 'Srz Clipboard' to the list"
 echo "      • Enable the toggle"
+echo ""
+echo "🔧 Management Commands:"
+echo "   • Check status: launchctl list | grep srz-clipboard"
+echo "   • Restart app: launchctl unload && launchctl load $LAUNCH_AGENT_FILE"
 
 exit 0

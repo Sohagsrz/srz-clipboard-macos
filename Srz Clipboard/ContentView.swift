@@ -161,6 +161,8 @@ struct ContentView: View {
                         loadTheme()
                         commandParser = CommandParser(clipboardManager: clipboardManager)
                         floatingPanelManager.setClipboardManager(clipboardManager)
+                        // Ensure permissions are requested early so paste works seamlessly
+                        clipboardManager.ensurePermissions()
                     }
         .onKeyPress(.escape) {
             clipboardManager.hideHistory()

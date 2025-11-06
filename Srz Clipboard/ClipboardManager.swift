@@ -489,7 +489,7 @@ class ClipboardManager: ObservableObject {
         print("✅ Paste command sent")
     }
     
-    private func checkAccessibilityPermissions() -> Bool {
+    func checkAccessibilityPermissions() -> Bool {
         let checkOptPrompt = kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String
         let options = [checkOptPrompt: true]
         let accessEnabled = AXIsProcessTrustedWithOptions(options as CFDictionary)
@@ -503,6 +503,26 @@ class ClipboardManager: ObservableObject {
         }
         
         return accessEnabled
+    }
+
+    /// Ensures required permissions are prompted: Accessibility (for CGEvent paste)
+    /// and Automation (for AppleScript). Call on app launch.
+    func ensurePermissions() {
+        _ = checkAccessibilityPermissions()
+        // Trigger Automation permission prompt by executing a harmless AppleScript
+        let script = """
+        tell application "System Events"
+            get name of application processes
+        end tell
+        """
+        let appleScript = NSAppleScript(source: script)
+        var error: NSDictionary?
+        _ = appleScript?.executeAndReturnError(&error)
+        if let error = error {
+            print("ℹ️ Automation permission may be required: \(error)")
+        } else {
+            print("✅ Automation check executed (AppleScript)")
+        }
     }
     
     private func pasteUsingCGEvent() -> Bool {

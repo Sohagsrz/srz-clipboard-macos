@@ -29,6 +29,7 @@ class ClipboardManager: ObservableObject {
     @Published var scheduledPastes: [ScheduledPaste] = []
     
     private var pasteboard = NSPasteboard.general
+    private var preferredPasteTargetBundleId: String?
     private var lastChangeCount = 0
     private var timer: Timer?
     private var undoStack: [ActionLogEntry] = []
@@ -45,6 +46,10 @@ class ClipboardManager: ObservableObject {
         loadReminders()
         loadScheduledPastes()
     }
+    func setPreferredPasteTarget(_ bundleId: String?) {
+        preferredPasteTargetBundleId = bundleId
+    }
+
     
     deinit {
         stopMonitoring()
@@ -183,6 +188,12 @@ class ClipboardManager: ObservableObject {
     
     private func performReliablePaste() {
         print("🔄 Performing reliable paste...")
+        // Activate preferred target app if known
+        if let bundleId = preferredPasteTargetBundleId,
+           let app = NSRunningApplication.runningApplications(withBundleIdentifier: bundleId).first {
+            app.activate(options: [.activateIgnoringOtherApps])
+            usleep(80_000) // 80ms to ensure focus
+        }
         
         // Method 1: Try AppleScript (most reliable on modern macOS)
         if tryAppleScriptPaste() {

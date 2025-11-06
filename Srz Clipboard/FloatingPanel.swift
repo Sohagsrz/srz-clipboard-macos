@@ -28,6 +28,9 @@ class FloatingPanelManager: ObservableObject {
             print("Creating new panel")
             createPanel()
         }
+        // Capture current frontmost app so we can paste into it later
+        let frontBundleId = NSWorkspace.shared.frontmostApplication?.bundleIdentifier
+        clipboardManager?.setPreferredPasteTarget(frontBundleId)
         
         // Position panel near cursor but ensure it stays on screen
         let screenFrame = NSScreen.main?.frame ?? CGRect(x: 0, y: 0, width: 1920, height: 1080)
@@ -264,10 +267,12 @@ struct FloatingPanelView: View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 8) {
                 ForEach(Array(pinnedItems.prefix(8).enumerated()), id: \.element.id) { index, item in
-                                Button(action: {
-                                    clipboardManager.pasteItem(at: index)
-                                    manager.hidePanel()
-                                }) {
+                    Button(action: {
+                        if let originalIndex = clipboardManager.clipboardHistory.firstIndex(where: { $0.id == item.id }) {
+                            clipboardManager.pasteItem(at: originalIndex)
+                        }
+                        manager.hidePanel()
+                    }) {
                         VStack(spacing: 2) {
                             Text(item.preview)
                                 .font(.system(.caption, design: .monospaced))
@@ -366,23 +371,35 @@ struct FloatingPanelView: View {
         ScrollView {
             LazyVStack(spacing: 1) {
                 ForEach(Array(filteredHistory.enumerated()), id: \.element.id) { index, item in
-                                FloatingItemView(
-                                    item: item,
-                                    index: index,
-                                    isSelected: index == clipboardManager.selectedIndex
-                                ) {
-                                    clipboardManager.pasteItem(at: index)
-                                    manager.hidePanel()
-                                } onAppend: {
-                        clipboardManager.appendItem(at: index)
+                    FloatingItemView(
+                        item: item,
+                        index: index,
+                        isSelected: index == clipboardManager.selectedIndex
+                    ) {
+                        if let originalIndex = clipboardManager.clipboardHistory.firstIndex(where: { $0.id == item.id }) {
+                            clipboardManager.pasteItem(at: originalIndex)
+                        }
+                        manager.hidePanel()
+                    } onAppend: {
+                        if let originalIndex = clipboardManager.clipboardHistory.firstIndex(where: { $0.id == item.id }) {
+                            clipboardManager.appendItem(at: originalIndex)
+                        }
                     } onDelete: {
-                        clipboardManager.deleteItem(at: index)
+                        if let originalIndex = clipboardManager.clipboardHistory.firstIndex(where: { $0.id == item.id }) {
+                            clipboardManager.deleteItem(at: originalIndex)
+                        }
                     } onPin: {
-                        clipboardManager.pinItem(at: index)
+                        if let originalIndex = clipboardManager.clipboardHistory.firstIndex(where: { $0.id == item.id }) {
+                            clipboardManager.pinItem(at: originalIndex)
+                        }
                     } onFavorite: {
-                        clipboardManager.favoriteItem(at: index)
+                        if let originalIndex = clipboardManager.clipboardHistory.firstIndex(where: { $0.id == item.id }) {
+                            clipboardManager.favoriteItem(at: originalIndex)
+                        }
                     } onLock: {
-                        clipboardManager.lockItem(at: index)
+                        if let originalIndex = clipboardManager.clipboardHistory.firstIndex(where: { $0.id == item.id }) {
+                            clipboardManager.lockItem(at: originalIndex)
+                        }
                     }
                 }
             }

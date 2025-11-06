@@ -187,27 +187,38 @@ class ClipboardManager: ObservableObject {
     }
     
     private func performReliablePaste() {
-        print("🔄 Performing reliable paste...")
+        let frontApp = NSWorkspace.shared.frontmostApplication
+        let frontBundleId = frontApp?.bundleIdentifier ?? "unknown"
+        let frontName = frontApp?.localizedName ?? "unknown"
+        print("🔄 Performing reliable paste... frontApp=\(frontName) bundleId=\(frontBundleId)")
+        
         // Activate preferred target app if known
         if let bundleId = preferredPasteTargetBundleId,
            let app = NSRunningApplication.runningApplications(withBundleIdentifier: bundleId).first {
+            print("➡️ Activating preferred target: \(bundleId)")
             app.activate(options: [.activateIgnoringOtherApps])
-            usleep(80_000) // 80ms to ensure focus
+            usleep(150_000) // give focus time (150ms)
         }
         
-        // Method 1: Try AppleScript (most reliable on modern macOS)
+        // Method 1: Targeted AppleScript to the frontmost app (UI scripting)
+        if tryTargetedAppleScriptPaste() {
+            print("✅ Targeted AppleScript paste successful")
+            return
+        }
+        
+        // Method 2: Generic AppleScript via System Events
         if tryAppleScriptPaste() {
             print("✅ AppleScript paste successful")
             return
         }
         
-        // Method 2: Try CGEvent
+        // Method 3: CGEvent fallback
         if tryCGEventPaste() {
             print("✅ CGEvent paste successful")
             return
         }
         
-        // Method 3: Show helpful notification
+        // Method 4: Show helpful notification
         print("⚠️ All paste methods failed, showing notification")
         showHelpfulNotification()
     }
@@ -231,6 +242,34 @@ class ClipboardManager: ObservableObject {
         }
         
         print("✅ AppleScript executed successfully")
+        return true
+    }
+
+    private func tryTargetedAppleScriptPaste() -> Bool {
+        guard let frontName = NSWorkspace.shared.frontmostApplication?.localizedName else {
+            print("ℹ️ No frontmost app name; skipping targeted AppleScript")
+            return false
+        }
+        print("🎯 Trying targeted AppleScript paste to app: \(frontName)")
+        // UI scripting to specific app process requires Accessibility permission
+        let script = """
+        tell application "System Events"
+            if (exists application process \"\(frontName)\") then
+                tell application process \"\(frontName)\"
+                    keystroke "v" using command down
+                end tell
+            else
+                keystroke "v" using command down
+            end if
+        end tell
+        """
+        let appleScript = NSAppleScript(source: script)
+        var error: NSDictionary?
+        _ = appleScript?.executeAndReturnError(&error)
+        if let error = error {
+            print("❌ Targeted AppleScript error: \(error)")
+            return false
+        }
         return true
     }
     

@@ -376,10 +376,13 @@ struct FloatingPanelView: View {
                         index: index,
                         isSelected: index == clipboardManager.selectedIndex
                     ) {
-                        if let originalIndex = clipboardManager.clipboardHistory.firstIndex(where: { $0.id == item.id }) {
-                            clipboardManager.pasteItem(at: originalIndex)
-                        }
+                        // Hide panel first to return focus to target app
                         manager.hidePanel()
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                            if let originalIndex = clipboardManager.clipboardHistory.firstIndex(where: { $0.id == item.id }) {
+                                clipboardManager.pasteItem(at: originalIndex)
+                            }
+                        }
                     } onAppend: {
                         if let originalIndex = clipboardManager.clipboardHistory.firstIndex(where: { $0.id == item.id }) {
                             clipboardManager.appendItem(at: originalIndex)

@@ -157,11 +157,21 @@ class ClipboardManager: ObservableObject {
             return
         }
         
-        print("🎯 Pasting item \(index): \(item.content.prefix(50))...")
+        print("🎯 Pasting item \(index)...")
         
-        // Copy to clipboard first
-        copyToClipboard(item.content)
-        print("✅ Text copied to clipboard")
+        // Copy to clipboard first (text or image)
+        if item.type == .image, let data = item.imageData {
+            if copyImageToClipboard(data) {
+                print("✅ Image copied to clipboard")
+            } else {
+                print("❌ Failed to copy image to clipboard")
+                logAction("paste \(index)", "❌ Failed to copy image to clipboard")
+                return
+            }
+        } else {
+            copyToClipboard(item.content)
+            print("✅ Text copied to clipboard")
+        }
         
         // Try the most reliable method first
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
@@ -459,6 +469,32 @@ class ClipboardManager: ObservableObject {
     private func copyToClipboard(_ content: String) {
         pasteboard.clearContents()
         pasteboard.setString(content, forType: .string)
+    }
+
+    private func copyImageToClipboard(_ imageData: Data) -> Bool {
+        pasteboard.clearContents()
+        // Try to create NSImage from data
+        guard let image = NSImage(data: imageData) else { return false }
+        // Prefer PNG representation when possible
+        var wrote = false
+        if let tiffData = image.tiffRepresentation,
+           let rep = NSBitmapImageRep(data: tiffData),
+           let pngData = rep.representation(using: .png, properties: [:]) {
+            wrote = pasteboard.setData(pngData, forType: .png)
+        }
+        // Fallback to TIFF
+        if !wrote {
+            wrote = pasteboard.setData(image.tiffRepresentation, forType: .tiff)
+        }
+        // Also set general pasteboard item with NSImage for broader compatibility
+        if wrote {
+            let item = NSPasteboardItem()
+            if let tiff = image.tiffRepresentation {
+                item.setData(tiff, forType: .tiff)
+            }
+            pasteboard.writeObjects([image])
+        }
+        return wrote
     }
     
     private func simulatePaste() {

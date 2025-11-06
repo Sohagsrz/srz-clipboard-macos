@@ -200,78 +200,18 @@ class ClipboardManager: ObservableObject {
             usleep(150_000) // give focus time (150ms)
         }
         
-        // Method 1: Targeted AppleScript to the frontmost app (UI scripting)
-        if tryTargetedAppleScriptPaste() {
-            print("✅ Targeted AppleScript paste successful")
-            return
-        }
-        
-        // Method 2: Generic AppleScript via System Events
-        if tryAppleScriptPaste() {
-            print("✅ AppleScript paste successful")
-            return
-        }
-        
-        // Method 3: CGEvent fallback
+        // Method 1: CGEvent (Swift/Foundation) — requires Accessibility
         if tryCGEventPaste() {
             print("✅ CGEvent paste successful")
             return
         }
         
-        // Method 4: Show helpful notification
+        // Method 2: Show helpful notification
         print("⚠️ All paste methods failed, showing notification")
         showHelpfulNotification()
     }
     
-    private func tryAppleScriptPaste() -> Bool {
-        print("🎯 Trying AppleScript paste...")
-        
-        let script = """
-        tell application "System Events"
-            keystroke "v" using command down
-        end tell
-        """
-        
-        let appleScript = NSAppleScript(source: script)
-        var error: NSDictionary?
-        let result = appleScript?.executeAndReturnError(&error)
-        
-        if let error = error {
-            print("❌ AppleScript error: \(error)")
-            return false
-        }
-        
-        print("✅ AppleScript executed successfully")
-        return true
-    }
-
-    private func tryTargetedAppleScriptPaste() -> Bool {
-        guard let frontName = NSWorkspace.shared.frontmostApplication?.localizedName else {
-            print("ℹ️ No frontmost app name; skipping targeted AppleScript")
-            return false
-        }
-        print("🎯 Trying targeted AppleScript paste to app: \(frontName)")
-        // UI scripting to specific app process requires Accessibility permission
-        let script = """
-        tell application "System Events"
-            if (exists application process \"\(frontName)\") then
-                tell application process \"\(frontName)\"
-                    keystroke "v" using command down
-                end tell
-            else
-                keystroke "v" using command down
-            end if
-        end tell
-        """
-        let appleScript = NSAppleScript(source: script)
-        var error: NSDictionary?
-        _ = appleScript?.executeAndReturnError(&error)
-        if let error = error {
-            print("❌ Targeted AppleScript error: \(error)")
-            return false
-        }
-        return true
-    }
+    // AppleScript-based methods removed per requirement
     
     private func tryCGEventPaste() -> Bool {
         print("🎯 Trying CGEvent paste...")
@@ -591,24 +531,9 @@ class ClipboardManager: ObservableObject {
         return accessEnabled
     }
 
-    /// Ensures required permissions are prompted: Accessibility (for CGEvent paste)
-    /// and Automation (for AppleScript). Call on app launch.
+    /// Ensures required permissions are prompted: Accessibility (for CGEvent paste).
     func ensurePermissions() {
         _ = checkAccessibilityPermissions()
-        // Trigger Automation permission prompt by executing a harmless AppleScript
-        let script = """
-        tell application "System Events"
-            get name of application processes
-        end tell
-        """
-        let appleScript = NSAppleScript(source: script)
-        var error: NSDictionary?
-        _ = appleScript?.executeAndReturnError(&error)
-        if let error = error {
-            print("ℹ️ Automation permission may be required: \(error)")
-        } else {
-            print("✅ Automation check executed (AppleScript)")
-        }
     }
     
     private func pasteUsingCGEvent() -> Bool {
@@ -646,28 +571,7 @@ class ClipboardManager: ObservableObject {
         return true
     }
     
-    private func pasteUsingSimpleAppleScript() -> Bool {
-        print("🎯 Attempting simple AppleScript paste...")
-        
-        // Simple AppleScript that just simulates Cmd+V
-        let script = """
-        tell application "System Events"
-            keystroke "v" using command down
-        end tell
-        """
-        
-        let appleScript = NSAppleScript(source: script)
-        var error: NSDictionary?
-        let result = appleScript?.executeAndReturnError(&error)
-        
-        if let error = error {
-            print("❌ AppleScript error: \(error)")
-            return false
-        }
-        
-        print("✅ Simple AppleScript executed successfully")
-        return true
-    }
+    // Simple AppleScript fallback removed per requirement
     
     private func compressText(_ text: String) -> String {
         let lines = text.components(separatedBy: .newlines)
